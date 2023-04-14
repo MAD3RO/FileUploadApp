@@ -1,0 +1,272 @@
+<div
+  class="container"
+  fxLayout="column"
+  fxLayoutAlign="center center"
+  fxLayoutGap="24px"
+>
+  <mat-card
+    class="card"
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    fxLayoutGap="24px"
+  >
+    <h1 class="title">Multiple File Upload Component</h1>
+
+    <div class="form-group">
+      <mat-card
+        class="drop-zone"
+        (drop)="onDrop($event)"
+        (dragover)="fileOver($event)"
+        (dragleave)="fileLeave($event)"
+        [class.active]="isActive"
+        #fileDropRef
+      >
+        <mat-icon>cloud_upload</mat-icon>
+        <p>Drag & drop your assets here</p>
+        <p>or</p>
+        <p>
+          <button mat-raised-button (click)="onClick()" color="warn">
+            Browse
+          </button>
+        </p>
+      </mat-card>
+    </div>
+
+    <div class="form-group">
+      <button mat-raised-button color="warn" (click)="clearFiles()">
+        Clear Files
+      </button>
+    </div>
+
+    <div *ngFor="let file of files" class="file-list">
+      <mat-icon>description</mat-icon>
+      <div class="file-info">
+        <p class="file-name">{{ file.name }}</p>
+        <p class="file-size">{{ file.size }}</p>
+      </div>
+    </div>
+  </mat-card>
+</div>
+
+<input
+  #fileInput
+  type="file"
+  (change)="onFileSelect($event)"
+  multiple
+  value=""
+  hidden
+/>
+
+<!-- <div class="center">
+  <ngx-file-drop
+    dropZoneLabel="Drop files here"
+    (onFileDrop)="dropped($event)"
+    (onFileOver)="fileOver($event)"
+    (onFileLeave)="fileLeave($event)"
+  >
+    <ng-template
+      ngx-file-drop-content-tmp
+      let-openFileSelector="openFileSelector"
+    >
+      Optional custom content that replaces the the entire default content.
+      <button type="button" (click)="openFileSelector()">Browse Files</button>
+    </ng-template>
+  </ngx-file-drop>
+  <div class="upload-table">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody class="upload-name-style">
+        <tr *ngFor="let item of files; let i = index">
+          <td>
+            <strong>{{ item.relativePath }}</strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div> -->
+
+<!-- <input
+  type="file"
+  multiple
+  hidden
+  #fileInput
+  (click)="fileInput.value = null"
+  value=""
+  (change)="onFileInputChange($event)"
+  accept="{{ data.fileExtension }}"
+/> -->
+
+<!-- <div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h1 class="mb-3">Multiple File Upload Component</h1>
+
+      <div class="form-group">
+        <label for="fileUpload">Select files to upload:</label>
+        <input
+          type="file"
+          id="fileUpload"
+          (change)="onFileSelect($event)"
+          multiple
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="fileDrop">Or drag and drop files here:</label>
+        <ngx-file-drop
+          [ngClass]="'droparea'"
+          (onFileDrop)="dropped($event)"
+          (onFileOver)="fileOver($event)"
+          (onFileLeave)="fileLeave($event)"
+          [class.active]="isActive"
+          #fileDropRef
+        >
+          <p>Drag files here.</p>
+        </ngx-file-drop>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary" (click)="clearFiles()">
+          Clear Files
+        </button>
+      </div>
+
+      <div *ngFor="let file of files">
+        <p>{{ file.name }} - {{ file.size }}</p>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- <div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div
+        class="droparea"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event)"
+        (dragleave)="onDragLeave($event)"
+        [class.active]="isActive"
+      >
+        <input
+          type="file"
+          name="userFiles"
+          class="browse-file"
+          (change)="onSelectedFile($event)"
+          multiple
+        />
+        <h4>
+          Choose files or <br />
+          Drag and drop files here
+        </h4>
+      </div>
+      <div
+        class="mt-2"
+        *ngIf="uploadResponse.progress > 0 && uploadResponse.progress != 100"
+      >
+        <div class="progress" style="height: 20px; margin-bottom: 20px">
+          <div
+            class="progress-bar progress-bar-striped bg-info"
+            role="progressbar"
+            [style.width.%]="uploadResponse.progress"
+            aria-valuenow="25"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            {{ uploadResponse.progress }}%
+          </div>
+        </div>
+      </div>
+      <div class="card mt-3 file-list" *ngIf="uploadResponse.files">
+        <div class="card-header">File List</div>
+        <ul class="list-group list-group-flush">
+          <ng-container *ngFor="let item of uploadResponse.files">
+            <li class="list-group-item">
+              {{ item.filename }} - Status: <span>Upload complete</span>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- <div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h1 class="mb-3">Multiple File Upload Component</h1>
+
+      <div class="form-group">
+        <label for="fileUpload">Select files to upload:</label>
+        <input
+          type="file"
+          id="fileUpload"
+          (change)="onFileSelect($event)"
+          multiple
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="fileDrop">Or drag and drop files here:</label>
+        <ngx-file-drop
+          [ngClass]="'drop-zone'"
+          (onFileDrop)="dropped($event)"
+          (onFileOver)="fileOver($event)"
+          (onFileLeave)="fileLeave($event)"
+          #fileDropRef
+        >
+          <p>Drag files here.</p>
+        </ngx-file-drop>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary" (click)="clearFiles()">
+          Clear Files
+        </button>
+      </div>
+
+      <div *ngFor="let file of files">
+        <p>{{ file.name }} - {{ file.size | fileSize }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div
+  class="upload-container"
+  ngxFileDrop
+  [multiple]="true"
+  (onFileDrop)="onFileDropped($event)"
+>
+  <div class="upload-text">
+    <i class="fa fa-cloud-upload"></i>
+    <span>Drag and drop files here or click to select files</span>
+  </div>
+  <div *ngFor="let file of files">
+    <div class="file-row">
+      <div class="file-name">{{ file.name }}</div>
+      <div class="file-progress">
+        <div class="progress-bar" [style.width.%]="file.progress"></div>
+      </div>
+      <div class="file-status">{{ file.status }}</div>
+      <div class="file-action" *ngIf="file.status === 'Error'">
+        <button class="btn btn-primary btn-sm" (click)="retry(file)">
+          Retry
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="upload-footer" *ngIf="allFailed">
+    <button class="btn btn-primary btn-sm" (click)="retryAll()">
+      Retry All
+    </button>
+  </div>
+</div> -->

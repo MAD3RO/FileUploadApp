@@ -1,0 +1,82 @@
+<div mat-dialog-title class="dialog-title"></div>
+<mat-dialog-content class="mat-body-1">
+  <app-file-upload></app-file-upload>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-raised-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+    <span class="button-text">Cancel</span>
+  </button>
+</mat-dialog-actions>
+
+<!-- <div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h1 class="mb-3">Multiple File Upload Component</h1>
+
+      <div class="form-group">
+        <label for="fileUpload">Select files to upload:</label>
+        <input
+          type="file"
+          id="fileUpload"
+          (change)="onFileSelect($event)"
+          multiple
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="fileDrop">Or drag and drop files here:</label>
+        <ngx-file-drop
+          [ngClass]="'drop-zone'"
+          (onFileDrop)="dropped($event)"
+          (onFileOver)="fileOver($event)"
+          (onFileLeave)="fileLeave($event)"
+          #fileDropRef
+        >
+          <p>Drag files here.</p>
+        </ngx-file-drop>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary" (click)="clearFiles()">
+          Clear Files
+        </button>
+      </div>
+
+      <div *ngFor="let file of files">
+        <p>{{ file.name }} - {{ file.size | fileSize }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="upload-container"
+  ngxFileDrop
+  [multiple]="true"
+  (onFileDrop)="onFileDropped($event)"
+>
+  <div class="upload-text">
+    <i class="fa fa-cloud-upload"></i>
+    <span>Drag and drop files here or click to select files</span>
+  </div>
+  <div *ngFor="let file of files">
+    <div class="file-row">
+      <div class="file-name">{{ file.name }}</div>
+      <div class="file-progress">
+        <div class="progress-bar" [style.width.%]="file.progress"></div>
+      </div>
+      <div class="file-status">{{ file.status }}</div>
+      <div class="file-action" *ngIf="file.status === 'Error'">
+        <button class="btn btn-primary btn-sm" (click)="retry(file)">
+          Retry
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="upload-footer" *ngIf="allFailed">
+    <button class="btn btn-primary btn-sm" (click)="retryAll()">
+      Retry All
+    </button>
+  </div>
+</div> -->
