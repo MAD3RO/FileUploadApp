@@ -1,0 +1,80 @@
+@import "../../../../theme/theme-variables.scss";
+
+.container {
+  width: 40rem;
+}
+
+.header-container {
+  padding: 24px 0px;
+  width: 100%;
+  font-size: 18px;
+}
+
+.title {
+  font-size: 36px;
+  text-align: center;
+  margin: 0;
+}
+
+.drop-zone {
+  padding: 32px;
+  border-radius: 8px;
+  border: 2px dashed #8e8e8e;
+  color: #ccc;
+  width: 100%;
+  transition: all 0.2s ease-in-out;
+  margin-top: 12px;
+  background-color: #535353;
+
+  &.active {
+    border: 2px dashed #c87800;
+    background-color: #603a007d;
+  }
+
+  p {
+    font-size: 18px;
+  }
+}
+
+.file-list {
+  max-height: 20rem;
+  min-height: 8rem;
+  overflow-y: auto;
+}
+
+.file-list-item {
+  margin-top: 16px;
+  font-size: 14px;
+
+  .file-size {
+    font-weight: bolder;
+  }
+
+  .retry-upload {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .file-name {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
+
+.all-failed-container {
+  margin: 1rem 0rem;
+  border-left: 4px solid;
+  border-color: $app-warn-color;
+  background-color: #e9e9e9;
+  color: #121212;
+  border-radius: 8px;
+
+  .error-icon {
+    margin-left: 1rem;
+  }
+
+  .retry-btn {
+    color: #121212;
+  }
+}

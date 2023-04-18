@@ -1,0 +1,121 @@
+<div class="container">
+  <div
+    *ngIf="!importing || files.length === 0; else fileList"
+    fxLayout="column"
+    fxLayoutGap="12px"
+  >
+    <div *ngIf="files.length">
+      <div
+        class="header-container"
+        fxLayout="row"
+        fxLayoutAlign="space-between center"
+      >
+        <div fxFlex="*">{{ files.length + " Files selected" }}</div>
+        <div fxFlex="80px">
+          <button mat-raised-button (click)="onImport()" color="primary">
+            Import
+          </button>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+    </div>
+    <div
+      fxLayout="column"
+      fxLayoutAlign="center center"
+      class="drop-zone"
+      (drop)="onDrop($event)"
+      (dragover)="fileOver($event)"
+      (dragleave)="fileLeave($event)"
+      [class.active]="isActive"
+      #fileDropRef
+    >
+      <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="6px">
+        <mat-icon class="upload-icon">cloud_upload</mat-icon>
+        <p>Drag & drop your assets here</p>
+      </div>
+      <p>or</p>
+      <p>
+        <button
+          mat-raised-button
+          (click)="onClick()"
+          color="primary"
+          tabindex="-1"
+        >
+          Browse
+        </button>
+      </p>
+    </div>
+  </div>
+
+  <ng-template #fileList>
+    <div
+      *ngIf="allFailed && showAllFailedDiv"
+      class="all-failed-container"
+      fxLayout="row"
+      fxLayoutAlign="space-between center"
+    >
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px">
+        <mat-icon class="error-icon" color="warn">error</mat-icon>
+        <span>Upload Failed</span>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="6px">
+        <button class="retry-btn" mat-button (click)="retryAll()">RETRY</button>
+        <button mat-icon-button (click)="hideAllFailedDiv()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div class="file-list">
+      <div
+        *ngFor="let file of files"
+        class="file-list-item"
+        fxLayout="column"
+        fxLayoutAlign="start stretch"
+        fxLayoutGap="0px"
+      >
+        <div class="file-name">{{ file.name }}</div>
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxFlexFill>
+          <div fxLayout="column" fxLayoutGap="10px" fxFlex="*">
+            <div fxLayout="row" fxLayoutAlign="space-between center">
+              <div class="file-size">{{ file.size | filesize }}</div>
+              <div
+                class="file-progress"
+                [style.color]="getProgressBarColor(file)"
+              >
+                {{ file.progress }}%
+              </div>
+            </div>
+            <mat-progress-bar
+              [value]="file.progress"
+              [color]="getProgressBarColor(file)"
+            ></mat-progress-bar>
+          </div>
+          <button fxFlex="48px" mat-icon-button (click)="removeFile(file)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div
+          *ngIf="file.status === 'Error' || file.status === 'Failed'"
+          fxLayout="row"
+          fxLayoutAlign="start center"
+          fxLayoutGap="6px"
+          class="error-message"
+          fxFlexFill
+        >
+          <div>Error uploading file.</div>
+          <a class="retry-upload" (click)="retryUpload(file)">Try again?</a>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<input
+  #fileInput
+  type="file"
+  (change)="onFileSelect($event)"
+  multiple
+  value=""
+  hidden
+/>
