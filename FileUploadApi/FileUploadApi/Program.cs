@@ -18,11 +18,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-//builder.Services.AddCors(p => p.AddPolicy(allowSpecificOrigins, builder =>
-//{
-//    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-//}));
-
 builder.Services.Configure<IISServerOptions>(options =>
 {
     options.MaxRequestBodySize = int.MaxValue;
@@ -46,15 +41,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//app.UseStaticFiles();
-
 app.UseRouting();
 
 app.UseCors(allowSpecificOrigins);
 
 app.UseAuthorization();
-
-//app.MapControllers();
 
 app.UseEndpoints(endpoints =>
 {

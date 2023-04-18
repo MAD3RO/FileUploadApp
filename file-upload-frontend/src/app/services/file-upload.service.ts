@@ -3,128 +3,66 @@ import {
   HttpEvent,
   HttpEventType,
   HttpHeaders,
-  HttpParameterCodec,
-  HttpParams,
-  HttpRequest,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, catchError, first, map, tap } from 'rxjs';
+import { catchError, of, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { FileUpload } from '../shared/components/file-upload/file-upload.component';
+import { FileUpload } from '../shared/models/file-upload.model';
+import { FileUploadStatus } from '../shared/types/file-upload-status.type';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FileUploadService {
   baseUrl = `${environment.baseUrl}/fileupload/`;
-  // handleError:HandleError;
 
-  constructor(
-    private http: HttpClient //  private httpErrorHandler:HttpErrorHandler
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  // uploadFile(file: FormData): Observable<any> {
-  //   // const formData = new FormData();
-  //   // formData.append('file', file);
-  //   return this.http
-  //     .post(this.generateFullApiUrl('upload'), file, {
-  //       reportProgress: true,
-  //       observe: 'events',
-  //     })
-  //     .pipe(
-  //       tap((res) => console.log('MH: ', res)),
-  //       map((event) => this.getEventMessage(event))
-  //       // catchError(this.handleError('fileUpload',null))
-  //     );
-  // }
-
-  fileUpload(data: FileUpload[]) {
-    const files = data.map((o) => o.data);
-    let __params = this.newParams();
+  uploadFile(data: FileUpload) {
+    const file = data.data;
     const __headers = new HttpHeaders();
-    let __body: any = null;
     __headers.append('Content-Type', 'multipart/form-data');
+    let __body: any = null;
     const __formData = new FormData();
 
-    console.log('MH files: ', files);
-
-    if (files !== null && typeof files !== 'undefined') {
-      for (let i = 0; i < files.length; i++) {
-        __formData.append('files', files[i]);
-        console.log('MH files[i]: ', files[i]);
-        // __formData.append('file', files[i] as string | Blob);
-      }
+    if (file !== null && typeof file !== 'undefined') {
+      __formData.append('file', file);
     }
 
     __body = __formData;
 
-    console.log('MH __body: ', __body);
-    const req = new HttpRequest<any>('POST', this.baseUrl + `upload`, __body, {
-      headers: __headers,
-      // headers: undefined,
-      params: __params,
-      responseType: 'json',
-      reportProgress: true,
-    });
+    return this.http
+      .post<any>(this.generateFullApiUrl('upload'), __body, {
+        headers: __headers,
+        responseType: 'json',
+        reportProgress: true,
+        observe: 'events',
+      })
+      .pipe(
+        tap((event: HttpEvent<any>) => {
+          if (event.type === HttpEventType.UploadProgress) {
+            data.progress = this.fileUploadProgress(event);
+          } else if (
+            event.type === HttpEventType.Response ||
+            event instanceof Response
+          ) {
+            data.status = FileUploadStatus.Completed;
+          }
+        }),
+        catchError((error) => {
+          data.status = FileUploadStatus.Failed;
+          data.error = error;
 
-    return this.http.request<any>(req);
-
-    // return this.http
-    //   .post(`${this.baseUrl}upload`, formData, {
-    //     reportProgress: true,
-    //     observe: 'events',
-    //   })
-    //   .pipe(
-    //     // first(),
-    //     tap((res) => console.log('MH result: ', res)),
-    //     map((event) => this.getEventMessage(event))
-    //     // catchError(this.handleError('fileUpload',null))
-    //   );
-  }
-
-  private getEventMessage(event: HttpEvent<any>) {
-    switch (event.type) {
-      case HttpEventType.UploadProgress:
-        return this.fileUploadProgress(event);
-      case HttpEventType.Response:
-        return event.body;
-      default:
-        return `Upload event: ${event.type}`;
-    }
+          return of();
+        })
+      );
   }
 
   private fileUploadProgress(event: any) {
-    const percentDone = Math.round((100 * event.loaded) / event.total);
-    return { progress: percentDone, files: [] };
+    return Math.round((100 * event.loaded) / event.total);
   }
 
   private generateFullApiUrl(apiUrl: string): string {
     return this.baseUrl + apiUrl;
   }
-
-  protected newParams(): HttpParams {
-    return new HttpParams({
-      encoder: PARAMETER_CODEC,
-    });
-  }
 }
-
-class ParameterCodec implements HttpParameterCodec {
-  encodeKey(key: string): string {
-    return encodeURIComponent(key);
-  }
-
-  encodeValue(value: string): string {
-    return encodeURIComponent(value);
-  }
-
-  decodeKey(key: string): string {
-    return decodeURIComponent(key);
-  }
-
-  decodeValue(value: string): string {
-    return decodeURIComponent(value);
-  }
-}
-
-const PARAMETER_CODEC = new ParameterCodec();

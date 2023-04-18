@@ -1,7 +1,8 @@
-import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FileUploadService } from 'src/app/services/file-upload.service';
-import { UploadResponse } from '../../models/upload-response';
+import { HttpEventType } from '@angular/common/http';
+import { FileUpload } from '../../models/file-upload.model';
+import { FileUploadStatus } from '../../types/file-upload-status.type';
 
 @Component({
   selector: 'app-file-upload',
@@ -9,73 +10,27 @@ import { UploadResponse } from '../../models/upload-response';
   styleUrls: ['./file-upload.component.scss'],
 })
 export class FileUploadComponent implements OnInit {
-  @ViewChild('fileDropRef', { static: false }) fileDropEl: any;
   @ViewChild('fileInput') fileInput: ElementRef = new ElementRef(null);
 
+  get allFailed() {
+    return this.files.every((file) => file.status === FileUploadStatus.Failed);
+  }
   files: FileUpload[] = [];
-
-  uploadResponse: UploadResponse = { progress: 0, files: [] };
   isActive = false;
-  // files: any[] = [];
-  public allFailed = false;
+  importing = false;
+  showAllFailedDiv = true;
 
-  constructor(
-    private http: HttpClient,
-    private fileUploadService: FileUploadService
-  ) {}
+  constructor(private fileUploadService: FileUploadService) {}
 
   ngOnInit(): void {
     console.log('FileUploadComponent initialized.');
   }
 
-  // onDragOver(event: any) {
-  //   event.preventDefault();
-  //   event.stopPropagation();
-  //   this.isActive = true;
-  // }
-
-  // onDragLeave(event: any) {
-  //   event.preventDefault();
-  //   event.stopPropagation();
-  //   this.isActive = false;
-  // }
-
-  // onDrop(event: any) {
-  //   event.preventDefault();
-  //   event.stopPropagation();
-  //   this.isActive = false;
-  //   let droppedFiles = event.dataTransfer.files;
-  //   if (droppedFiles.length > 0) {
-  //     this.onDroppedFile(droppedFiles);
-  //   }
-  // }
-
-  // onSelectedFile(event: any) {
-  //   let selectedFiles = event.target.files;
-  //   if (selectedFiles.length > 0) {
-  //     this.onDroppedFile(selectedFiles);
-  //   }
-  // }
-
-  // onDroppedFile(droppedFiles: any) {
-  //   let formData = new FormData();
-  //   for (let item of droppedFiles) {
-  //     // formData.append('userFiles', item.file, item.relativePath);
-  //     formData.append('userFiles', item.file);
-  //   }
-
-  //   this.fileUploadService.fileUpload(formData).subscribe((result) => {
-  //     this.uploadResponse = result;
-  //     console.log('result: ', result);
-  //   });
-  // }
-
-  // ----------------------------- VER. 2 -----------------------------
-
   onDrop(event: DragEvent) {
     event.preventDefault();
-    // event.stopPropagation();
+    event.stopPropagation();
     this.isActive = false;
+    this.resetSetup();
 
     const files = <any>event?.dataTransfer?.files;
     if (files?.length > 0) {
@@ -83,22 +38,19 @@ export class FileUploadComponent implements OnInit {
     }
   }
 
-  onDroppedFile(droppedFiles: any) {
+  onDroppedFile(droppedFiles: any[]) {
     if (!droppedFiles.length) return;
 
     for (let i = 0; i < droppedFiles.length; i++) {
       const file = new FileUpload(droppedFiles[i]);
       this.files.push(file);
     }
-
-    this.uploadFiles();
   }
 
-  uploadFiles() {
-    this.fileUploadService.fileUpload(this.files).subscribe((result) => {
-      // this.uploadResponse = result;
-      console.log('result: ', result);
-    });
+  onImport() {
+    this.importing = true;
+    this.resetSetup();
+    this.uploadFiles();
   }
 
   onClick() {
@@ -125,87 +77,65 @@ export class FileUploadComponent implements OnInit {
       const file = new FileUpload(files[i]);
       this.files.push(file);
     }
-
-    this.uploadFiles();
   }
 
-  // onFileSelect(event: any) {
-  //   const files = event.target.files;
-
-  //   if (!files.length) return;
-  //   this.uploadFiles(files);
-  // }
-
-  clearFiles() {
-    this.files = [];
+  retryUpload(file: FileUpload) {
+    file.progress = 0;
+    file.status = FileUploadStatus.Pending;
+    this.uploadFile(file);
   }
 
-  // onFileDropped(files: NgxFileDropEntry[]) {
-  //   for (const droppedFile of files) {
-  //     if (droppedFile.fileEntry?.isFile) {
-  //       const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
-  //       fileEntry.file((file: any) => {
-  //         const uploadFile = new FileUpload(file);
-  //         this.files.push(uploadFile);
-  //         this.uploadFile(uploadFile);
-  //       });
-  //     }
-  //   }
-  // }
+  retryAll() {
+    this.files.forEach((file) => {
+      if (file.status === FileUploadStatus.Failed) {
+        file.progress = 0;
+        file.status = FileUploadStatus.Pending;
+        this.uploadFile(file);
+      }
+    });
+  }
 
-  // retry(file: FileUpload) {
-  //   file.progress = 0;
-  //   file.status = 'Pending';
-  //   this.uploadFile(file);
-  // }
+  removeFile(file: FileUpload) {
+    const index = this.files.indexOf(file);
+    if (index > -1) {
+      this.files.splice(index, 1);
+    }
 
-  // retryAll() {
-  //   this.allFailed = false;
-  //   this.files.forEach((file) => {
-  //     if (file.status === 'Error') {
-  //       file.progress = 0;
-  //       file.status = 'Pending';
-  //       this.uploadFile(file);
-  //     }
-  //   });
-  // }
+    if (this.files.length === 0) {
+      this.importing = false;
+    }
+  }
 
-  // private uploadFile(file: FileUpload) {
-  //   const formData = new FormData();
-  //   formData.append('file', file.data);
+  getProgressBarColor(file: FileUpload): string {
+    switch (file.status) {
+      case FileUploadStatus.Pending:
+        return 'accent';
+      case FileUploadStatus.Uploading:
+      case FileUploadStatus.Completed:
+        return 'primary';
+      case FileUploadStatus.Failed:
+        return 'warn';
+      default:
+        return 'primary';
+    }
+  }
 
-  //   this.http
-  //     .post('/api/upload', formData, {
-  //       reportProgress: true,
-  //       observe: 'events',
-  //     })
-  //     .subscribe(
-  //       (event) => {
-  //         if (event.type === HttpEventType.UploadProgress) {
-  //           // const progress = Math.round((100 * event.loaded) / event.total);
-  //           // file.progress = progress;
-  //         } else if (event.type === HttpEventType.Response) {
-  //           file.status = 'Done';
-  //         }
-  //       },
-  //       (error) => {
-  //         file.status = 'Error';
-  //         this.allFailed = this.files.every((file) => file.status === 'Error');
-  //       }
-  //     );
-  // }
-}
+  hideAllFailedDiv() {
+    this.showAllFailedDiv = false;
+  }
 
-export class FileUpload {
-  public data: File;
-  public name: string;
-  public progress = 0;
-  public size = 0;
-  public status: string = 'Pending';
+  private uploadFile(file: FileUpload) {
+    this.fileUploadService.uploadFile(file).subscribe();
+  }
 
-  constructor(file: File) {
-    this.data = file;
-    this.name = file.name;
-    this.size = file.size;
+  private uploadFiles() {
+    this.files.forEach((file) => {
+      file.status = FileUploadStatus.Uploading;
+      this.uploadFile(file);
+    });
+  }
+
+  private resetSetup() {
+    this.showAllFailedDiv = true;
   }
 }

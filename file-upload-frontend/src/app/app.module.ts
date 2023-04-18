@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { FileUploadComponent } from './shared/components/file-upload/file-upload.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { NgxFileDropModule } from 'ngx-file-drop';
 import { NgModule } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FileUploadDialogComponent } from './shared/components/dialogs/file-upload-dialog/file-upload-dialog.component';
@@ -14,6 +13,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { NgxFileDropModule } from 'ngx-file-drop';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { NgxFilesizeModule } from 'ngx-filesize';
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
   declarations: [AppComponent, FileUploadComponent, FileUploadDialogComponent],
@@ -30,6 +31,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     FlexLayoutModule,
     ReactiveFormsModule,
     MatInputModule,
+    NgxFilesizeModule,
+    MatDividerModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

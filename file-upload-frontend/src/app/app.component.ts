@@ -17,8 +17,6 @@ export class AppComponent {
   }
 
   openFileUploadDialog() {
-    console.log('openFileUploadDialog()');
-
     this.dialog.open(FileUploadDialogComponent).afterClosed().subscribe();
   }
 }

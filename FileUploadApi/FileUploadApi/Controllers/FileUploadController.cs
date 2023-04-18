@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Drawing;
 
 namespace FileUploadApi.Controllers
 {
@@ -15,47 +14,30 @@ namespace FileUploadApi.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<ActionResult<object>> Upload(IFormFileCollection files)
+        public async Task<ActionResult> Upload(IFormFile file)
         {
-            if (files == null || files.Count == 0)
+            if (file == null)
             {
-                return BadRequest("No files found.");
+                return BadRequest("No file found.");
             }
 
-            string uploadsFolderPath = Path.Combine(_hostEnvironment.ContentRootPath, "Uploads");
-
-            if (!Directory.Exists(uploadsFolderPath))
+            try
             {
-                Directory.CreateDirectory(uploadsFolderPath);
-            }
+                string uploadsFolderPath = Path.Combine(_hostEnvironment.ContentRootPath, "Uploads");
 
-            foreach (IFormFile file in files)
-            {
-                if (file.Length > 0)
+                if (!Directory.Exists(uploadsFolderPath))
                 {
-                    //string filePath = Path.Combine(uploadsFolderPath, file.FileName);
-
-                    //using FileStream stream = new(filePath, FileMode.Create);
-                    //await file.CopyToAsync(stream);
+                    Directory.CreateDirectory(uploadsFolderPath);
                 }
+
+                string filePath = Path.Combine(uploadsFolderPath, file.FileName);
+
+                //using FileStream stream = new(filePath, FileMode.Create);
+                //await file.CopyToAsync(stream);
             }
-
-            return Ok(new { count = files.Count });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Uploadd(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
+            catch (Exception ex)
             {
-                return BadRequest();
-            }
-
-            var filePath = Path.Combine(Path.GetTempPath(), file.FileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
+                return BadRequest($"An error ocurred: {ex.Message}");
             }
 
             return Ok();
