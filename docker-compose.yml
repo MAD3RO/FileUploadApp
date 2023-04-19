@@ -1,0 +1,15 @@
+version: '3.4'
+services:
+  msnet6:
+    image: msnet6
+    build:
+      context: ./FileUploadApi/FileUploadApi
+      dockerfile: ./Dockerfile
+    ports:
+      - 5000:80
+  angular:
+    image: angular
+    build:
+      context: ./file-upload-frontend
+    ports:
+      - 4200:80

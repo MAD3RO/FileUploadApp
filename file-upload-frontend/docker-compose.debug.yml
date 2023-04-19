@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  fileuploadfrontend:
+    image: fileuploadfrontend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
