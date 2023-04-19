@@ -4,7 +4,7 @@ This is a web application developed using Angular 15 and .NET Core 6. The applic
 
 ## Installation
 
- 1. Clone the repository: git clone https://github.com/<MAD3RO>/FileUploadApp.git
+ 1. Clone the repository: git clone https://github.com/MAD3RO/FileUploadApp.git
  2. Install dependencies for the Angular application: cd FileUploadApp/file-upload-frontend && npm install
  3. Install dependencies for the .NET Core application: cd ../FileUploadApi && dotnet restore
  
